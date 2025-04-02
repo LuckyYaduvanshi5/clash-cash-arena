@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import MatchDashboard from "./pages/MatchDashboard";
 import Wallet from "./pages/Wallet";
 import Leaderboard from "./pages/Leaderboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import { UserProvider } from "./context/UserContext";
 import { MatchProvider } from "./context/MatchContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/match" element={<ProtectedRoute><MatchDashboard /></ProtectedRoute>} />
               <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
               <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

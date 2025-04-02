@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useUser } from '@/context/UserContext';
+import { toast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
@@ -22,9 +23,56 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-  const { login } = useUser();
+  const { login, isAuthenticated } = useUser();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // If user is already logged in, redirect to dashboard
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+    
+    // Check if there are any users in localStorage, if not create demo users
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    if (users.length === 0) {
+      // Create demo user and admin accounts
+      const demoUsers = [
+        {
+          id: '1',
+          username: 'user',
+          email: 'user@example.com',
+          password: 'password',
+          walletBalance: 100,
+          totalMatches: 5,
+          wins: 3,
+          losses: 2,
+          avatarUrl: `/avatars/avatar1.png`,
+          role: 'user'
+        },
+        {
+          id: '2',
+          username: 'admin',
+          email: 'admin@example.com',
+          password: 'password',
+          walletBalance: 1000,
+          totalMatches: 10,
+          wins: 8,
+          losses: 2,
+          avatarUrl: `/avatars/avatar2.png`,
+          role: 'admin'
+        }
+      ];
+      
+      localStorage.setItem('users', JSON.stringify(demoUsers));
+      
+      toast({
+        title: "Demo accounts created",
+        description: "User: user@example.com / Password: password\nAdmin: admin@example.com / Password: password",
+        duration: 5000,
+      });
+    }
+  }, [isAuthenticated, navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,6 +92,16 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fillDemoUser = () => {
+    form.setValue('email', 'user@example.com');
+    form.setValue('password', 'password');
+  };
+
+  const fillDemoAdmin = () => {
+    form.setValue('email', 'admin@example.com');
+    form.setValue('password', 'password');
   };
 
   return (
@@ -103,6 +161,25 @@ const Login = () => {
               >
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
+              
+              <div className="flex justify-between pt-2 text-sm">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="text-violet-400 hover:text-violet-300 p-0 h-auto"
+                  onClick={fillDemoUser}
+                >
+                  Demo User
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="text-violet-400 hover:text-violet-300 p-0 h-auto"
+                  onClick={fillDemoAdmin}
+                >
+                  Demo Admin
+                </Button>
+              </div>
               
               <div className="text-center text-sm text-slate-400">
                 Don't have an account?{' '}

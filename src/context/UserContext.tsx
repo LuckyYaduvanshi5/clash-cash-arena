@@ -11,6 +11,7 @@ export interface User {
   wins: number;
   losses: number;
   avatarUrl: string;
+  role: string; // 'user' or 'admin'
 }
 
 interface UserContextType {
@@ -22,6 +23,7 @@ interface UserContextType {
   addFunds: (amount: number) => void;
   deductFunds: (amount: number) => boolean;
   updateUserStats: (win: boolean) => void;
+  isAdmin: () => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -114,6 +116,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wins: 0,
         losses: 0,
         avatarUrl: `/avatars/avatar${Math.floor(Math.random() * 5) + 1}.png`,
+        role: 'user', // Default role is user
       };
       
       // Save to users array
@@ -228,6 +231,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const isAdmin = () => {
+    return user?.role === 'admin';
+  };
+
   return (
     <UserContext.Provider value={{
       user,
@@ -237,7 +244,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout,
       addFunds,
       deductFunds,
-      updateUserStats
+      updateUserStats,
+      isAdmin
     }}>
       {children}
     </UserContext.Provider>
